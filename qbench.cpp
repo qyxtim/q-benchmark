@@ -1,5 +1,4 @@
 #include "runner.hpp"
-#include <cassert>
 #include <cstddef>
 #include <random>
 
@@ -67,9 +66,8 @@ int main(int argc, char **argv)
     }
 
     // ensure the options are valid
-    assert(MIN > 0);
-    assert(MAX >= MIN);
-    assert(optind + 2 <= argc);
+    MIN = MIN <= 0 ? 1 : MIN;
+    MAX = MAX < MIN ? MIN : MAX;
 
     // Random Number Generator
     std::random_device rd;
