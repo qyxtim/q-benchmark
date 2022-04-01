@@ -20,8 +20,8 @@ q-benchmark only supports macOS/Linux now.
 3. Run benchmark by using `./qbench [options] command1 command2 ...`
     - Options:
       - `-w` times: assign the number of warmup function calls to the times. The default number of warmup function calls is `3`.
-      - `-l` lower: lower bound of the number of test runs.
-      - `-h` upper: upper bound of the number of test runs.
+      - `-l` lower: lower bound of the number of test runs. The default number is 100.
+      - `-h` upper: upper bound of the number of test runs. The default number is 1000.
 
 # Example
 
