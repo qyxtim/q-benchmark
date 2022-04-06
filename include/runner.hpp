@@ -54,13 +54,13 @@ public:
         std = sqrt(std / numRuns);
 
         fprintf(stdout, STYLE_BOLD);
-        fprintf(stdout, "Benchmark: %s\n", args[0]);
+        fprintf(stdout, "Benchmark: %s (%s%zu%s runs)\n", args[0], BLUE, numRuns, RESET);
         fprintf(stdout, STYLE_NO_BOLD);
 
         fprintf(stdout, "  Time: %s%f ms%s(mean) ± %s%f ms%s(std)\n", GREEN, mean, RESET, PURPLE, std, RESET);
 
-        fprintf(stdout, "  Range: %s%f ms%s(min) … %s%f ms%s(max) %s%zu%s runs\n",
-                GREEN, min_v, RESET, PURPLE, max_v, RESET, BLUE, numRuns, RESET);
+        fprintf(stdout, "  Range: %s%f ms%s(min) … %s%f ms%s(max)\n",
+                GREEN, min_v, RESET, PURPLE, max_v, RESET);
 
         fprintf(stdout, "\n");
     }

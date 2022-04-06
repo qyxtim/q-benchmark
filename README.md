@@ -40,13 +40,13 @@ To benchmark the `sleep` function, you can run:
 
 Then q-benchmark will output the statistical results:
 ```
-Benchmark: sleep
-  Time: 307.686333 ms(mean) ± 1.484943 ms(std)
-  Range: 306.007000 ms(min) … 309.618000 ms(max) 3 runs
+Benchmark: sleep (3 runs)
+  Time: 309.588000 ms(mean) ± 1.733092 ms(std)
+  Range: 307.142000 ms(min) … 310.946000 ms(max)
 
-Benchmark: sleep
-  Time: 306.958600 ms(mean) ± 1.506971 ms(std)
-  Range: 304.997000 ms(min) … 309.218000 ms(max) 5 runs
+Benchmark: sleep (5 runs)
+  Time: 309.904800 ms(mean) ± 0.930668 ms(std)
+  Range: 308.083000 ms(min) … 310.635000 ms(max)
 ```
 
 # License
