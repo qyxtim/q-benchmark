@@ -15,7 +15,7 @@ This tool uses about `250` lines of code to build a simple replica of hyperfine.
 
 q-benchmark only supports macOS/Linux now.
 
-The tool has two versions: `main` and `v2`. You are in `main` now. `main` version of the logging time function is more accurate than v2, but it cannot deal with some complex command line arguments.
+The tool has two versions: `main` and `v2`. You are in `main` now. `main` version of the logging time function is more accurate than `v2`, but it cannot deal with some complex command line arguments.
 
 Therefore, you can switch to `v2` branch if:
 1. `main` cannot parse your command line arguments
@@ -35,7 +35,7 @@ To use the `main` version:
 To benchmark the `sleep` function, you can run:
 
 ```
-./qbench -w 3 -l 1 -h 5 "sleep 0.3" "sleep 0.3"
+./bin/release/qbench -w 3 -l 1 -h 5 "sleep 0.3" "sleep 0.3"
 ```
 
 Then q-benchmark will output the statistical results:
