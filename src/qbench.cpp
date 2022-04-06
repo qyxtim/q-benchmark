@@ -2,17 +2,20 @@
 #include <cstddef>
 #include <random>
 
+#define DELIMITER " \t\r\a\n"
+#define BUFFER_SIZE 1024
+
 /*
     Parse the options into char** array
 */
 char **parseOptInProgram(char *program)
 {
-    size_t size = 5;
+    size_t size = BUFFER_SIZE;
     size_t cur = 0;
 
-    char **args = new char *[size];
+    char **args = new char *[BUFFER_SIZE];
 
-    char *token = strtok(program, " ");
+    char *token = strtok(program, DELIMITER);
     while (token != nullptr)
     {
         if (cur == size - 1)
