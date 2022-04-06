@@ -2,8 +2,6 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -17,7 +15,7 @@
 class Runner
 {
 public:
-    Runner(char **args, size_t numRuns, size_t warmupTimes) : args(args), numRuns(numRuns)
+    Runner(char *command, size_t numRuns, size_t warmupTimes) : command(command), numRuns(numRuns)
     {
         tests = new double[numRuns];
         run(warmupTimes);
@@ -25,7 +23,6 @@ public:
 
     ~Runner()
     {
-        delete[] args;
         delete[] tests;
     }
 
@@ -33,7 +30,7 @@ public:
     {
         if (!hasRunSuccess)
         {
-            fprintf(stderr, "Test failed to run");
+            fprintf(stderr, "Test failed to run\n");
             return;
         }
 
@@ -54,13 +51,13 @@ public:
         std = sqrt(std / numRuns);
 
         fprintf(stdout, STYLE_BOLD);
-        fprintf(stdout, "Benchmark: %s\n", args[0]);
+        fprintf(stdout, "Benchmark: %s (%s%zu%s runs)\n", command, BLUE, numRuns, RESET);
         fprintf(stdout, STYLE_NO_BOLD);
 
         fprintf(stdout, "  Time: %s%f ms%s(mean) ± %s%f ms%s(std)\n", GREEN, mean, RESET, PURPLE, std, RESET);
 
-        fprintf(stdout, "  Range: %s%f ms%s(min) … %s%f ms%s(max) %s%zu%s runs\n",
-                GREEN, min_v, RESET, PURPLE, max_v, RESET, BLUE, numRuns, RESET);
+        fprintf(stdout, "  Range: %s%f ms%s(min) … %s%f ms%s(max)\n",
+                GREEN, min_v, RESET, PURPLE, max_v, RESET);
 
         fprintf(stdout, "\n");
     }
@@ -84,11 +81,7 @@ private:
             close(fd);
 
             // run the benchmark program with args
-            if (execvp(args[0], args) == -1)
-            {
-                perror(args[0]);
-                exit(3);
-            }
+            execl("/bin/sh", "sh", "-c", command, (char *) NULL);
         }
         else if (pid < 0)
         {
@@ -101,7 +94,7 @@ private:
                 // wait for child process to exit
                 waitpid(pid, &status, WUNTRACED);
             } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-            return WEXITSTATUS(status) != 3;
+            return WEXITSTATUS(status) == 0;
         }
 
         return false;
@@ -147,7 +140,7 @@ private:
 
 private:
     // Program Info
-    char **args;
+    char *command;
     size_t numRuns;
 
     // Test Result

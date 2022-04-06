@@ -2,42 +2,6 @@
 #include <cstddef>
 #include <random>
 
-#define DELIMITER " \t\r\a\n"
-#define BUFFER_SIZE 1024
-
-/*
-    Parse the options into char** array
-*/
-char **parseOptInProgram(char *program)
-{
-    size_t size = BUFFER_SIZE;
-    size_t cur = 0;
-
-    char **args = new char *[BUFFER_SIZE];
-
-    char *token = strtok(program, DELIMITER);
-    while (token != nullptr)
-    {
-        if (cur == size - 1)
-        {
-            char **tmp = new char *[size * 2];
-            for (size_t i = 0; i < size; ++i)
-            {
-                tmp[i] = args[i];
-            }
-            delete[] args;
-            args = tmp;
-            size *= 2;
-        }
-        args[cur] = token;
-        ++cur;
-        token = strtok(NULL, " ");
-    }
-    args[cur] = NULL;
-
-    return args;
-}
-
 int main(int argc, char **argv)
 {
     size_t warmupTimes = 3;
@@ -80,7 +44,7 @@ int main(int argc, char **argv)
     // run benchmark for a list of programs
     for (int i = optind; i < argc; ++i)
     {
-        Runner runner(parseOptInProgram(argv[i]), distrib(gen), warmupTimes);
+        Runner runner(argv[i], distrib(gen), warmupTimes);
         runner.display();
     }
 
