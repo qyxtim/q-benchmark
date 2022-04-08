@@ -22,7 +22,7 @@ Therefore, you can switch to `v2` branch if:
 2. you cares more about the time comparison than the actual running time.
 
 To use the `main` version:
-1. Make sure you have `g++ >= 4.8.1` or `clang++ >= 3.3` installed.
+1. Make sure your compiler supports `c++17`.
 2. Run `make`.
 3. Run benchmark by using `./bin/release/qbench [options] command1 command2 ...`
     - Options:
@@ -41,12 +41,12 @@ To benchmark the `sleep` function, you can run:
 Then q-benchmark will output the statistical results:
 ```
 Benchmark: sleep (3 runs)
-  Time: 309.588000 ms(mean) ± 1.733092 ms(std)
-  Range: 307.142000 ms(min) … 310.946000 ms(max)
+  Time: 306.64 ms(mean) ± 1.76368 ms(std)
+  Range: 304.717 ms(min) … 308.977 ms(max)
 
 Benchmark: sleep (5 runs)
-  Time: 309.904800 ms(mean) ± 0.930668 ms(std)
-  Range: 308.083000 ms(min) … 310.635000 ms(max)
+  Time: 308.31 ms(mean) ± 0.991041 ms(std)
+  Range: 306.783 ms(min) … 309.333 ms(max)
 ```
 
 # License

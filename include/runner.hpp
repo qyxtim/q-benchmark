@@ -1,9 +1,7 @@
 #include "timer.hpp"
 #include <cmath>
-#include <cstddef>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include <iostream>
+#include <memory>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -17,29 +15,30 @@
 class Runner
 {
 public:
-    Runner(char **args, size_t numRuns, size_t warmupTimes) : args(args), numRuns(numRuns)
+    Runner(std::unique_ptr<char *[]> &&args, std::size_t numRuns, std::size_t warmupTimes) : args(std::move(args)), numRuns(numRuns), tests(std::make_unique<double[]>(numRuns))
     {
-        tests = new double[numRuns];
         run(warmupTimes);
     }
 
     ~Runner()
     {
-        delete[] args;
-        delete[] tests;
+    }
+
+    bool hasTestRunSuccessfully() const{
+        return hasRunSuccess;
     }
 
     void display() const
     {
         if (!hasRunSuccess)
         {
-            fprintf(stderr, "Test failed to run");
+            std::cerr << "Test failed to run" << std::endl;
             return;
         }
 
         double mean = 0, std = 0, min_v = tests[0], max_v = tests[0];
 
-        for (size_t i = 0; i < numRuns; ++i)
+        for (std::size_t i = 0; i < numRuns; ++i)
         {
             mean += tests[i];
             min_v = tests[i] < min_v ? tests[i] : min_v;
@@ -47,26 +46,25 @@ public:
         }
         mean /= numRuns;
 
-        for (size_t i = 0; i < numRuns; ++i)
-        {
-            std += (tests[i] - mean) * (tests[i] - mean);
-        }
+        for (std::size_t i = 0; i < numRuns; ++i)
+            std += pow(tests[i] - mean, 2);
         std = sqrt(std / numRuns);
 
-        fprintf(stdout, STYLE_BOLD);
-        fprintf(stdout, "Benchmark: %s (%s%zu%s runs)\n", args[0], BLUE, numRuns, RESET);
-        fprintf(stdout, STYLE_NO_BOLD);
+        std::cout << STYLE_BOLD << "Benchmark: " << args[0] << " ("
+                  << BLUE << numRuns << RESET << " runs)"
+                  << STYLE_NO_BOLD << std::endl;
 
-        fprintf(stdout, "  Time: %s%f ms%s(mean) ± %s%f ms%s(std)\n", GREEN, mean, RESET, PURPLE, std, RESET);
+        std::cout << "  Time: " << GREEN << mean << " ms" << RESET << "(mean) ± "
+                  << PURPLE << std << " ms" << RESET << "(std)" << std::endl;
 
-        fprintf(stdout, "  Range: %s%f ms%s(min) … %s%f ms%s(max)\n",
-                GREEN, min_v, RESET, PURPLE, max_v, RESET);
+        std::cout << "  Range: " << GREEN << min_v << " ms" << RESET << "(min) … "
+                  << PURPLE << max_v << " ms" << RESET << "(max)" << std::endl;
 
-        fprintf(stdout, "\n");
+        std::cout << std::endl;
     }
 
 private:
-    bool launch()
+    bool launch() const
     {
         pid_t pid;
         int status;
@@ -84,33 +82,34 @@ private:
             close(fd);
 
             // run the benchmark program with args
-            if (execvp(args[0], args) == -1)
+            if (execvp(args[0], args.get()) == -1)
             {
-                perror(args[0]);
-                exit(3);
+                exit(EXIT_FAILURE);
             }
         }
         else if (pid < 0)
         {
-            perror("Runner");
+            throw std::runtime_error("Failed to fork() the program");
         }
         else
         {
             do
             {
-                // wait for child process to exit
                 waitpid(pid, &status, WUNTRACED);
             } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-            return WEXITSTATUS(status) != 3;
+
+            if(WEXITSTATUS(status) != EXIT_SUCCESS)
+                std::cerr << "Failed to run " << args[0] << std::endl;
+            return WEXITSTATUS(status) == EXIT_SUCCESS;
         }
 
         return false;
     }
 
     // run warmup to minimize the effect of cache
-    bool warmup(size_t warmupTimes)
+    bool warmup(std::size_t warmupTimes) const
     {
-        for (size_t i = 0; i < warmupTimes; ++i)
+        for (std::size_t i = 0; i < warmupTimes; ++i)
         {
             if (!launch())
             {
@@ -122,7 +121,7 @@ private:
 
     bool runTest()
     {
-        for (size_t i = 0; i < numRuns; ++i)
+        for (std::size_t i = 0; i < numRuns; ++i)
         {
             Timer t;
             bool success = launch();
@@ -137,7 +136,7 @@ private:
     }
 
     // wrapper of warmup and runTest
-    void run(size_t warmupTimes)
+    void run(std::size_t warmupTimes)
     {
         if (warmup(warmupTimes))
         {
@@ -147,11 +146,11 @@ private:
 
 private:
     // Program Info
-    char **args;
-    size_t numRuns;
+    const std::unique_ptr<char *[]> args;
+    const std::size_t numRuns;
 
     // Test Result
-    double *tests;
+    const std::unique_ptr<double[]> tests;
 
     // Flag
     bool hasRunSuccess = false;

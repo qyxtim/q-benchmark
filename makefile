@@ -1,6 +1,6 @@
 # compilers and constant flags
 CC = g++
-CFLAGS = -Wall -Wextra -Werror -Wreturn-type -Wunreachable-code -Wunused-parameter -Wno-unused-command-line-argument -std=c++11
+CFLAGS = -Wall -Wextra -Werror -Wreturn-type -Wunreachable-code -Wunused-parameter -Wno-unused-command-line-argument -std=c++17
 
 # constants
 SRCDIR = src

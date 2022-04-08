@@ -1,5 +1,5 @@
 #include "runner.hpp"
-#include <cstddef>
+#include <memory>
 #include <random>
 
 #define DELIMITER " \t\r\a\n"
@@ -8,32 +8,35 @@
 /*
     Parse the options into char** array
 */
-char **parseOptInProgram(char *program)
+std::unique_ptr<char *[]> parseOptInProgram(char *program)
 {
     size_t size = BUFFER_SIZE;
     size_t cur = 0;
 
-    char **args = new char *[BUFFER_SIZE];
+    std::unique_ptr<char *[]> args = std::make_unique<char *[]>(BUFFER_SIZE);
 
     char *token = strtok(program, DELIMITER);
     while (token != nullptr)
     {
         if (cur == size - 1)
         {
-            char **tmp = new char *[size * 2];
+            std::unique_ptr<char *[]> tmp = std::make_unique<char *[]>(size * 2);
             for (size_t i = 0; i < size; ++i)
             {
                 tmp[i] = args[i];
             }
-            delete[] args;
-            args = tmp;
+            args = std::move(tmp);
             size *= 2;
         }
         args[cur] = token;
         ++cur;
-        token = strtok(NULL, " ");
+        token = strtok(NULL, DELIMITER);
     }
     args[cur] = NULL;
+
+    if(cur == 0){
+        return std::unique_ptr<char*[]>();
+    }
 
     return args;
 }
@@ -55,16 +58,16 @@ int main(int argc, char **argv)
             break;
         case 'l':
             if (!optarg)
-                return 1;
+                throw std::invalid_argument("-l needs to be provided with an option");
             MIN = std::stoul(optarg);
             break;
         case 'h':
             if (!optarg)
-                return 1;
+                throw std::invalid_argument("-h needs to be provided with an option");
             MAX = std::stoul(optarg);
             break;
         default:
-            return 1;
+            throw std::invalid_argument("Unknown argument(s)");
         }
     }
 
@@ -80,8 +83,14 @@ int main(int argc, char **argv)
     // run benchmark for a list of programs
     for (int i = optind; i < argc; ++i)
     {
-        Runner runner(parseOptInProgram(argv[i]), distrib(gen), warmupTimes);
-        runner.display();
+        std::unique_ptr<char*[]> args = parseOptInProgram(argv[i]);
+        if(args){
+            Runner runner(std::move(args), distrib(gen), warmupTimes);
+            if(runner.hasTestRunSuccessfully())
+                runner.display();
+        }else{
+            std::cerr << "None was supplied for commands" << std::endl;
+        }
     }
 
     return EXIT_SUCCESS;
