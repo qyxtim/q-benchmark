@@ -1,6 +1,7 @@
-#include "runner.hpp"
+#include "runner.h"
 #include <memory>
 #include <random>
+#include <unistd.h>
 
 #define DELIMITER " \t\r\a\n"
 #define BUFFER_SIZE 1024
@@ -21,10 +22,7 @@ std::unique_ptr<char *[]> parseOptInProgram(char *program)
         if (cur == size - 1)
         {
             std::unique_ptr<char *[]> tmp = std::make_unique<char *[]>(size * 2);
-            for (size_t i = 0; i < size; ++i)
-            {
-                tmp[i] = args[i];
-            }
+            std::copy(args.get(), args.get() + size, tmp.get());
             args = std::move(tmp);
             size *= 2;
         }
@@ -34,8 +32,9 @@ std::unique_ptr<char *[]> parseOptInProgram(char *program)
     }
     args[cur] = NULL;
 
-    if(cur == 0){
-        return std::unique_ptr<char*[]>();
+    if (cur == 0)
+    {
+        return std::unique_ptr<char *[]>();
     }
 
     return args;
@@ -83,14 +82,10 @@ int main(int argc, char **argv)
     // run benchmark for a list of programs
     for (int i = optind; i < argc; ++i)
     {
-        std::unique_ptr<char*[]> args = parseOptInProgram(argv[i]);
-        if(args){
-            Runner runner(std::move(args), distrib(gen), warmupTimes);
-            if(runner.hasTestRunSuccessfully())
-                runner.display();
-        }else{
-            std::cerr << "None was supplied for commands" << std::endl;
-        }
+        Runner runner(parseOptInProgram(argv[i]), distrib(gen), warmupTimes);
+        runner.run();
+        if (runner.hasTestRunSuccessfully())
+            runner.display();
     }
 
     return EXIT_SUCCESS;
