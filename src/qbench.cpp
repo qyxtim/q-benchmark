@@ -2,6 +2,7 @@
 #include <memory>
 #include <random>
 #include <unistd.h>
+#include <cstring>
 
 #define DELIMITER " \t\r\a\n"
 #define BUFFER_SIZE 1024
