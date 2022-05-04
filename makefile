@@ -48,10 +48,10 @@ endef
 HEADER_DEPEND := $(patsubst %.o,%.d,$(OBJECTS))
 -include $(HEADER_DEPEND)
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.$(EXT) Makefile
+$(BUILDDIR)/%.o: $(SRCDIR)/%.$(EXT) makefile
 	$(COMPILE_COMMAND)
 
-$(BUILDDIR)/%.o: $(TESTDIR)/%.$(EXT) Makefile
+$(BUILDDIR)/%.o: $(TESTDIR)/%.$(EXT) makefile
 	$(COMPILE_COMMAND)
 
 

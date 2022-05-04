@@ -1,8 +1,9 @@
 #include "runner.h"
-#include <sys/wait.h>
-#include <unistd.h>
+#include "timer.h"
 #include <cmath>
 #include <iostream>
+#include <sys/wait.h>
+#include <unistd.h>
 
 void Runner::run()
 {

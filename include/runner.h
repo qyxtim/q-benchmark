@@ -1,8 +1,6 @@
 #pragma once
 
-#include "timer.h"
 #include <memory>
-
 
 #define STYLE_BOLD "\033[1m"
 #define STYLE_NO_BOLD "\033[22m"
