@@ -1,7 +1,6 @@
 # compilers and constant flags
 CC = g++
-CFLAGS = -Wall -Wextra -Wreturn-type -Wunreachable-code -Wunused-parameter -Wno-unused-command-line-argument -std=c++17
-
+CFLAGS = -Wall -Werror -Wextra -Wpedantic -Wvla -Wextra-semi -Wnull-dereference -Wswitch-enum -Wsuggest-override -std=c++17
 # constants
 SRCDIR = src
 TESTDIR = test
@@ -15,15 +14,15 @@ BASE_BUILDDIR = build
 BASE_TARGETDIR = bin
 TARGETDIR = $(BASE_TARGETDIR)/release
 BUILDDIR = $(BASE_BUILDDIR)/release
-CDFLAGS = -O2 -Wno-format-security
+CDFLAGS = -O2
 LDFLAGS =
 
 # debug mode
 ifeq ($(debug), 1)
 	TARGETDIR = $(BASE_TARGETDIR)/debug
 	BUILDDIR = $(BASE_BUILDDIR)/debug
-	CDFLAGS = -g -fsanitize=address -fno-omit-frame-pointer
-	LDFLAGS = -fsanitize=address
+	CDFLAGS = -g -fsanitize=address,undefined
+	LDFLAGS = -fsanitize=address,undefined
 endif
 
 
@@ -84,4 +83,8 @@ leaks:
 	@$(foreach file, $(wildcard $(TARGETDIR)/*),  leaks -atExit -- ./$(file);)
 
 
-.PHONY: clean run valgrind leaks
+sanitizer:
+	@$(foreach file, $(wildcard $(TARGETDIR)/*),  ./$(file);)
+
+
+.PHONY: clean run valgrind leaks sanitizer
