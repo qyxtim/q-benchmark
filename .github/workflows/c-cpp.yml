@@ -16,8 +16,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: make
-      run: make
-    - name: make run
+      run: |
+        make
+        make debug=1
+    - name: run release
       run: make run
     - name: run sanitizer
       run: make sanitizer debug=1
